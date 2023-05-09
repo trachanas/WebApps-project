@@ -1,0 +1,3 @@
+[database]
+ip = localhost
+port = 9092
