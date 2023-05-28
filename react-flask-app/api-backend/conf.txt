@@ -1,0 +1,9 @@
+1) Start ZooKeeper: Kafka uses ZooKeeper for coordination between brokers.
+    Start a ZooKeeper instance by running the following command from the Kafka directory:
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+2) Start the Kafka broker: Start the Kafka broker
+    by running the following command from the Kafka directory:
+bin/kafka-server-start.sh config/server.properties
+
+3)

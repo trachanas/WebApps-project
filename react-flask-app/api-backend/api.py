@@ -1,24 +1,28 @@
 import time
 import json
-import configparser
 import logging
 import pandas as pd
-import fastavro.schema
-import io
-import argparse
-import snscrape.modules.twitter as sntwitter
 import time
 from langdetect import detect
 from flask_cors import CORS, cross_origin
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
+
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import KafkaError
+from bson import json_util
+import random
+import threading
+from amazon_reviews_scraper import get_product_name, \
+get_product_reviews_by_name, AmazonScraperTool
+
+
 
 app = Flask(__name__)
 cors = CORS(app)
 
 #config.read('application_properties')
 #ip = config.get('database', 'ip')
+
 ip = '127.0.0.1'
 port = '9092'
 url = ip + ':' + port
@@ -29,61 +33,39 @@ formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-
-@app.route('/time')
-def get_current_time():
-    return {'time': time.time()}
-
-@app.route('/hello')
-def get_message():
-    return {'message' : 'hello'}
-
-@app.route('/api/endpoint', methods=['POST'])
-@cross_origin(origin='*', headers=['Content-Type'])
-def handle_post_request():
-    data = request.json
-    print(data)
-    producer = KafkaProducer(bootstrap_servers=[url])
-    topic_name = 'hello'
-    publish_message(topic_name)
-    return {"Success" : "ssss"}
+amz_scraper = AmazonScraperTool()
 
 
 
-
-def publish_message(topic_name):
-    try:
-        start_time = time.perf_counter()
-        print("this is the topic name: {}".format(topic_name))
-        df = retrieve_tweets(topic_name, threshold=10)
-        end_time = time.perf_counter()
-        tweets_retrieval_time = round(end_time - start_time, 5)
-        logger.info(f'Tweets dataset retrieved in {tweets_retrieval_time} secs.')
-        json_str = df.to_json()
-        start_time = time.perf_counter()
-        #producer.send(topic_name, json_str.encode('utf-8'))
-        end_time = time.perf_counter()
-        sending_time = round(end_time - start_time, 5)
-        producer.flush()
-        logger.info(f'Message published successfully in {sending_time} secs.')
-    except Exception as ex:
-        logger.error('Exception in publishing message.')
-        logger.error(str(ex))
+@app.route('/product_name/<path:link_to_product>', methods=['GET'])
+@cross_origin() 
+def get_product_name_request(link_to_product):
+    return {'product_name' : get_product_name(link_to_product)}
 
 
-
-def retrieve_tweets(topic_name, threshold):
-    tweets_list = list()
-    search_query = f'from:{topic_name}'
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(search_query).get_items()):
-        if i >= threshold:
-            break
-        lang = detect(tweet.rawContent)
-        if lang == 'en':
-            tweets_list.append([tweet.date, tweet.user.username, tweet.rawContent])
-    tweets_df = pd.DataFrame(tweets_list, columns=['datetime', 'username', 'text'])
-    return tweets_df
+@app.route('/product_with_all_reviews/<path:link_to_product>', methods=['GET'])
+def get_product_reviews_by_name_request(link_to_product):
+    product_name = get_product_name(link_to_product)
+    result = get_product_reviews_by_name(product_name)
+    json_data = json.loads(json_util.dumps(result))
+    return json_data
 
 
+def process_analysis_request(product_url):
+    amz_scraper.scrape_reviews(product_url)
 
 
+@app.route('/start_analysis/<path:product_url>', methods=['POST'])
+@cross_origin() 
+def start_analysis_request(product_url):
+    thread = threading.Thread(target=process_analysis_request, args=(product_url,))
+    thread.start()
+    print(product_url)
+    response_data = {
+        'message': 'Success',
+        'data': { 'product_url' : product_url}
+    }
+    response = make_response(jsonify(response_data), 200)
+    print('******** Request analysis processing started in a new thread. ********')
+    return response
+   

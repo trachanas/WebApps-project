@@ -1,14 +1,16 @@
-time
-json
 logging
 pandas
 fastavro
-snscrape==0.5.0.20230113.
 langdetect
-time
 flask
 flask_cors
-kafka
 kafka-python
-pip install python-dotenv
-(venv) (base) MBPtoutesGeorge:api-backend georgetrachanas$ vi .flaskenv
+requests
+bs4
+Flask~=2.3.2
+pandas
+nltk
+beautifulsoup4
+PyYAML
+pymongo
+bson

@@ -1,0 +1,12 @@
+Document for ASUS-Lightweight-Programmable-Ultralight-Resistance already exists!
+GET reviews from: https://www.amazon.com/ASUS-Lightweight-Programmable-Ultralight-Resistance/product-reviews/B09QRXBPQL/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&pageNumber=1.
+Returned 10 reviews.
+{'product_name': 'ASUS-Lightweight-Programmable-Ultralight-Resistance', 'positive': 9, 'negative': 0, 'neutral': 0, 'positive_percentage': 1.0, 'negative_percentage': 0.0}
+GET reviews from: https://www.amazon.com/ASUS-Lightweight-Programmable-Ultralight-Resistance/product-reviews/B09QRXBPQL/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&pageNumber=2.
+Returned 10 reviews.
+{'product_name': 'ASUS-Lightweight-Programmable-Ultralight-Resistance', 'positive': 6, 'negative': 2, 'neutral': 2, 'positive_percentage': 0.6, 'negative_percentage': 0.2}
+GET reviews from: https://www.amazon.com/ASUS-Lightweight-Programmable-Ultralight-Resistance/product-reviews/B09QRXBPQL/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews&pageNumber=3.
+Returned 6 reviews.
+{'product_name': 'ASUS-Lightweight-Programmable-Ultralight-Resistance', 'positive': 6, 'negative': 0, 'neutral': 0, 'positive_percentage': 1.0, 'negative_percentage': 0.0}
+Review URL does not have next page.
+ASUS_Lightweight_Programmable_Ultralight_Resistance_B09QRXBPQL

@@ -1,0 +1,76 @@
+from kafka import KafkaProducer, KafkaConsumer
+from kafka.errors import KafkaError
+import json
+import configparser
+import logging
+import pandas as pd
+import fastavro.schema
+import io
+import argparse
+import snscrape.modules.twitter as sntwitter
+import time
+from langdetect import detect
+
+
+config = configparser.ConfigParser()
+config.read('application_properties')
+ip = config.get('database', 'ip')
+port = config.get('database', 'port')
+url = ip + ':' + port
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+logger.info("Producer sends to " + url)
+
+# Set up the Kafka producer
+producer = KafkaProducer(bootstrap_servers=[url])
+
+# Publish a message to a topic
+def publish_message(topic_name):
+    try:
+        start_time = time.perf_counter()
+        df = retrieve_tweets(topic_name, threshold=1000)
+        end_time = time.perf_counter()
+        tweets_retrieval_time = round(end_time - start_time, 5)
+        logger.info(f'Tweets dataset retrieved in {tweets_retrieval_time} secs.')
+        json_str = df.to_json()
+        start_time = time.perf_counter()
+        producer.send(topic_name, json_str.encode('utf-8'))
+        end_time = time.perf_counter()
+        sending_time = round(end_time - start_time, 5)
+        producer.flush()
+        logger.info(f'Message published successfully in {sending_time} secs.')
+    except Exception as ex:
+        logger.error('Exception in publishing message.')
+        logger.error(str(ex))
+
+
+def retrieve_tweets(topic_name, threshold):
+    tweets_list = list()
+    search_query = f'from:{topic_name}'
+    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(search_query).get_items()):
+        if i >= threshold:
+            break
+        lang = detect(tweet.rawContent)
+        if lang == 'en':
+            tweets_list.append([tweet.date, tweet.user.username, tweet.rawContent])
+    tweets_df = pd.DataFrame(tweets_list, columns=['datetime', 'username', 'text'])
+    return tweets_df
+
+
+# Create the parser
+parser = argparse.ArgumentParser(description='Description of your script')
+
+parser.add_argument('--topic_name', type=str)
+args = parser.parse_args()
+
+# Access the values of the arguments
+topic_name = args.topic_name
+
+publish_message(topic_name)
+
+

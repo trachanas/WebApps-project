@@ -1,0 +1,13 @@
+database:
+  database_uri: 'mongodb://127.0.0.1:27017/'
+  database_name: 'reviews_db'
+  database_collection_name: 'reviews_collection'
+
+app:
+  amazon_url: 'https://www.amazon.com/'
+
+amazon_reviews_scraper:
+  threshold:  20
+  pr_url: 'product-reviews'
+  rest_url: 'ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews'
+  pn_url: '&pageNumber='
