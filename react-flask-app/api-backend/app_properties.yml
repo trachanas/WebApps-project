@@ -7,7 +7,9 @@ app:
   amazon_url: 'https://www.amazon.com/'
 
 amazon_reviews_scraper:
-  threshold:  20
+  threshold:  3
   pr_url: 'product-reviews'
   rest_url: 'ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews'
   pn_url: '&pageNumber='
+  api_key: '2c3ae200618bf6c5873fa77f1cb16c14'
+  scraperapi: 'http://api.scraperapi.com/'
